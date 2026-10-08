@@ -1,138 +1,104 @@
-# 🔥💧 Level 1: Create Your First Bender
+#include <iostream>
+#include <string>
+#include <vector>
+#include <tuple>
+#include <cmath>
+using namespace std;
+class bender{
+    string name, element;
+    int hp, attack, defense, speed;
+    vector <tuple<string ,int>> moves;
+    int hpog;
+    public:
+    void dispstat(bender n){
+        cout << n.name << '(' << n.element << "): " << n.hp << '/' << n.hpog << ", Attack: " << n.attack << ", Defense: " << n.defense << ", Speed: " << n.speed << endl;
+        cout << "Moves: ";
+        for (tuple < string, int > & move : n.moves){
+            cout << get<0> (move) << '(' << get <1> (move) << "), " ; 
+        }
+        cout << endl;
+    }
+    
+    public:
+    void attackchar(bender &defender, int index){
+        int damage = round(static_cast<double>(attack) * (get<1>(moves[index])) / defender.defense);
+        cout << defender.name << " took " << damage << " damage!" << endl;
+        defender.hp-=damage;
+        if (defender.hp<0){
+            defender.hp = 0;
+        }
+        cout << "\n" ;
+        dispstat(defender);
+    }
+    public:
+    void checkiffainted(bender defender){
+        if (defender.hp == 0){
+            cout << defender.name << " has fainted! " << endl;
+        }
+        else {
+            cout << defender.name << " has not fainted! " << endl;
+        }
+    }
 
-## Introduction to the Elemental Arena Battle Simulator
+public:
+    void setattributes(string n, string e, int h, int a, int d, int s, vector<tuple<string, int>> m)
+    {
+        name = n;
+        element = e;
+        hp = h;
+        attack = a;
+        defense = d;
+        speed = s;
+        moves = m;
+        hpog = hp;
+    }
+};
 
-This challenge involves building an **Elemental Arena** battle simulator. You will start by creating the fundamental building block of the simulator: the `Bender` class.
+void input(bender & character){
+    string n, e;
+    int h, a, d, s;
+    vector<tuple<string, int>> m;
+    cout << " Bender Creation: " << endl;
+    std::cout << "- name: ";
+    std::cin >> n;
 
-A duel is a turn-based encounter between two benders. The outcome of the duel depends on the bender's stats, the moves they use, and their elemental affinity.
+    std::cout << "- element (\"Water\", \"Fire\", \"Earth\", or \"Air\"): ";
+    std::cin >> e;
 
-- **Stats:** Each bender has HP (Health Points), Attack, Defense, and Speed.
-- **Element:** Each bender belongs to one of four elements: Water, Fire, Earth, or Air.
-- **Moves:** Each bender has a set of four moves with varying power levels.
-- **Battle Logic:** The speed of a bender determines who attacks first. The damage dealt by an attack is calculated based on the attacker's Attack stat, the move's power, and the defender's Defense stat.
+    std::cout << "- hp (1-200): ";
+    std::cin >> h;
 
-> **Note:** elemental type does **not** affect damage yet in this level. A bender's Element is simply stored as an attribute for now. The type-advantage system (Water being strong against Fire, for example) is introduced in Level 2.
+    std::cout << "- attack (1-100): ";
+    std::cin >> a;
 
-## Problem Statement
+    std::cout << "- defense (1-100): ";
+    std::cin >> d;
 
-Design and implement a `Bender` class that represents a duel-ready fighter with all essential attributes and basic functionality. This will be the foundation upon which all future battle mechanics will be built.
+    std::cout << "- speed (1-100): ";
+    std::cin >> s;
 
-## Requirements
+    cout << "- moves: "<< endl;
+    for (int i = 0; i< 4; i++){
+        string n ;
+        int p;
+        cout << "move name: ";
+        cin >> n;
+        cout << "attack power: ";
+        cin >> p;
+        tuple<string, int> move (n,p);
+        m.push_back(move);
+    }
+    character.setattributes(n,e,h,a,d,s,m);
+}
 
-- **Attributes:** Name, Element, HP (Health Points), Attack, Defense, Speed
-- **Moveset:** Array of 4 moves with different power levels
-- **Core Methods:** Attack another bender, take damage, check if fainted
-- **Constructor:** Initialize a bender with custom stats
-
-## Input Format
-
-```
-Bender creation:
-- name: string
-- element: string ("Water", "Fire", "Earth", or "Air")
-- hp: integer (1-200)
-- attack: integer (1-100)
-- defense: integer (1-100)
-- speed: integer (1-100)
-- moves: array of 4 move names with power levels
-
-Attack action:
-- attacker: Bender object
-- defender: Bender object
-- move_index: integer (0-3)
-```
-
-## Output Format
-
-```
-Bender status display
-Attack result messages
-Fainted status check
-```
-
-## Damage Formula (Level 1: Basic Version)
-
-No type advantage yet, that's introduced in Level 2.
-
-```
-damage = round((attacker_attack * move_power) / defender_defense)
-```
-
-## Example 1: Basic Bender Creation and Attack
-
-**Input:**
-```
-# Create Kael
-kael = Bender("Kael", "Fire", 100, 58, 38, 88,
-             [("Ember Slash", 40), ("Quick Jab", 30), ("Focus", 0), ("Flame Surge", 70)])
-
-# Create Mira
-mira = Bender("Mira", "Water", 92, 50, 45, 60,
-             [("Water Whip", 35), ("Tide Push", 25), ("Mist Veil", 0), ("Tidal Wave", 60)])
-
-# Display initial stats
-print(kael.display_stats())
-print(mira.display_stats())
-
-# Kael attacks Mira with Ember Slash
-kael.attack(mira, 0)
-print(mira.display_stats())
-
-# Check if Mira fainted
-print(f"Mira fainted: {mira.is_fainted()}")
-```
-
-**Expected Output:**
-```
-Kael (Fire) - HP: 100/100, Attack: 58, Defense: 38, Speed: 88
-Moves: Ember Slash (40), Quick Jab (30), Focus (0), Flame Surge (70)
-
-Mira (Water) - HP: 92/92, Attack: 50, Defense: 45, Speed: 60
-Moves: Water Whip (35), Tide Push (25), Mist Veil (0), Tidal Wave (60)
-
-Kael used Ember Slash!
-Mira took 52 damage!
-
-Mira (Water) - HP: 40/92, Attack: 50, Defense: 45, Speed: 60
-Moves: Water Whip (35), Tide Push (25), Mist Veil (0), Tidal Wave (60)
-
-Mira fainted: False
-```
-
-## Example 2: Bender Fainting
-
-**Input:**
-```
-# Create weak Zephyr
-zephyr = Bender("Zephyr", "Air", 28, 12, 50, 95,
-               [("Gust", 0), ("Wind Slap", 18), ("Tumble", 12), ("Cyclone", 22)])
-
-# Create strong Doran
-doran = Bender("Doran", "Earth", 145, 80, 75, 40,
-              [("Boulder Throw", 75), ("Rock Fist", 42), ("Tremor", 48), ("Mountain Crush", 85)])
-
-print(zephyr.display_stats())
-print(doran.display_stats())
-
-# Doran attacks with Boulder Throw
-doran.attack(zephyr, 0)
-print(zephyr.display_stats())
-print(f"Zephyr fainted: {zephyr.is_fainted()}")
-```
-
-**Expected Output:**
-```
-Zephyr (Air) - HP: 28/28, Attack: 12, Defense: 50, Speed: 95
-Moves: Gust (0), Wind Slap (18), Tumble (12), Cyclone (22)
-
-Doran (Earth) - HP: 145/145, Attack: 80, Defense: 75, Speed: 40
-Moves: Boulder Throw (75), Rock Fist (42), Tremor (48), Mountain Crush (85)
-
-Doran used Boulder Throw!
-Zephyr took 120 damage!
-
-Zephyr (Air) - HP: 0/28, Attack: 12, Defense: 50, Speed: 95
-Moves: Gust (0), Wind Slap (18), Tumble (12), Cyclone (22)
-
-Zephyr fainted: True
-```
+int main(){
+    bender character1;
+    input(character1);
+    bender character2;
+    input(character2);
+    character1.dispstat(character1);
+    character2.dispstat(character2);
+    character1.attackchar(character2,0);
+    character2.checkiffainted(character2);
+    return 0;
+}
